@@ -1,4 +1,5 @@
 <template>
+  <BaseWebTorrentImage v-if='webtorrent' :torrent='webtorrent' />
   <div ref="src" class="hidden break-word-wrap"><slot /></div>
   <div ref="append" class="hidden break-word-wrap"><slot name="append" /></div>
   <div v-html="html" ref="html" class="break-word-wrap dynamic-content" @click='handleClicks' :class='longForm ? "long-form" : ""'/>
@@ -30,6 +31,7 @@ import emoji from 'markdown-it-emoji'
 import helpersMixin from '../utils/mixin'
 import * as bolt11Parser from 'light-bolt11-decoder'
 import BaseInvoice from 'components/BaseInvoice.vue'
+import BaseWebTorrentImage from 'components/BaseWebTorrentImage.vue'
 
 const md = MarkdownIt({
   html: false,
@@ -187,12 +189,14 @@ export default {
   emits: ['expand', 'resized'],
   components: {
     BaseInvoice,
+    BaseWebTorrentImage,
   },
 
   data() {
     return {
       html: '',
       invoice: null,
+      webtorrent: null,
       // links: [],
     }
   },
@@ -221,6 +225,19 @@ export default {
         }
       }
       let replacedContent = this.content.replace(bolt11Regex, replacer)
+
+      const webTorrentRegex = /magnet:[^ \n]+/g
+      const webTorrentReplacer = (match, index) => {
+        try {
+          this.webtorrent = match
+          return ''
+        } catch (e) {
+          console.log('webtorrent', e)
+          return match
+        }
+      }
+      replacedContent = this.content.replace(webTorrentRegex, webTorrentReplacer)
+
       return replacedContent
     }
   },

@@ -11,6 +11,7 @@
 const webpack = require('webpack')
 const ESLintPlugin = require('eslint-webpack-plugin')
 const { configure } = require('quasar/wrappers')
+const nodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin')
 
 module.exports = configure(function (ctx) {
   return {
@@ -73,6 +74,10 @@ module.exports = configure(function (ctx) {
         chain
           .plugin('eslint-webpack-plugin')
           .use(ESLintPlugin, [{ extensions: ['js', 'vue'] }])
+
+        chain
+          .plugin('node-polyfill')
+          .use(nodePolyfillWebpackPlugin)
       },
 
       // blergh
